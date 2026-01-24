@@ -70,7 +70,7 @@ async def post_update(session: db_dep, post_id: int, update_data: PostUpdateRequ
     return post
 
 
-@router.delete("/{post_id}",status_code=204)
+@router.delete("/{post_id}", status_code=204)
 async def delet_post(session: db_dep, post_id: int):
     stmt = select(Post).where(Post.id == post_id)
     res = session.execute(stmt)
@@ -85,18 +85,16 @@ async def delet_post(session: db_dep, post_id: int):
 
 
 @router.put("/deactivate")
-async def deactive(session: db_dep, post_id: int,is_active:bool=None):
+async def deactive(session: db_dep, post_id: int, is_active: bool = None):
     stmt = select(Post).where(Post.id == post_id)
     res = session.execute(stmt)
     post = res.scalars().first()
 
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    
-        
+
     post.is_active = is_active
     session.commit()
     session.refresh(post)
 
     return post
-

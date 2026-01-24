@@ -9,5 +9,6 @@ dependencies = [
     "fastapi[standart]>=0.128.0",
     "psycopg2-binary>=2.9.11",
     "ruff>=0.14.14",
+    "unicode>=2.9",
     "uvicorn>=0.40.0",
 ]
