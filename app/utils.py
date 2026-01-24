@@ -1,2 +1,2 @@
 def generate_slug(title):
-    return title.lower().replace(" ", "-")
+    return title.lower().replace(" ", "_")

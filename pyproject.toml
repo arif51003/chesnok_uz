@@ -8,5 +8,6 @@ dependencies = [
     "dotenv>=0.9.9",
     "fastapi[standart]>=0.128.0",
     "psycopg2-binary>=2.9.11",
+    "ruff>=0.14.14",
     "uvicorn>=0.40.0",
 ]
