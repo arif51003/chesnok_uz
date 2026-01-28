@@ -10,3 +10,4 @@ app = FastAPI(
 app.include_router(post_router)
 app.include_router(category_router)
 app.include_router(tag_router)
+app.include_router(user_router)

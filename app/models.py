@@ -40,7 +40,7 @@ class User(BaseModel):
         "Post", back_populates="user", cascade="all,delete-orphan", passive_deletes=True
     )
     kasb: Mapped["Profession"] = relationship("Profession", back_populates="user")
-    comment: Mapped[list["Comment"]] = relationship(
+    comments: Mapped[list["Comment"]] = relationship(
         "Comment", back_populates="user", passive_deletes=True
     )
     avatar: Mapped["Media"] = relationship("Media", foreign_keys=[avatar_id])
@@ -63,7 +63,7 @@ class Post(BaseModel):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     user: Mapped["User"] = relationship("User", back_populates="posts")
-    comment: Mapped[list["Comment"]] = relationship("Comment", back_populates="post")
+    comments: Mapped[list["Comment"]] = relationship("Comment", back_populates="post")
     category: Mapped["Category"] = relationship("Category", back_populates="post")
     postmedia: Mapped[list["PostMedia"]] = relationship(
         "PostMedia", back_populates="post"
@@ -82,8 +82,8 @@ class Comment(BaseModel):
     text: Mapped[str] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    post: Mapped["Post"] = relationship("Post", back_populates="comment")
-    user: Mapped["User"] = relationship("User", back_populates="comment")
+    post: Mapped["Post"] = relationship("Post", back_populates="comments")
+    user: Mapped["User"] = relationship("User", back_populates="comments")
 
     def __repr__(self):
         return f"Comment:{self.text}"
@@ -132,6 +132,7 @@ class Media(Base):
     postmedia: Mapped[list["PostMedia"]] = relationship(
         "PostMedia", back_populates="media"
     )
+    user: Mapped["User"] = relationship("User", back_populates="avatar")
 
     def __repr__(self):
         return f"Media:{self.url}"
