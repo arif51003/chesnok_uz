@@ -158,3 +158,36 @@ class PostTag(Base):
 
     tag: Mapped["Tag"] = relationship("Tag", back_populates="tagpost")
     post: Mapped["Post"] = relationship("Post", back_populates="tagpost")
+
+
+class UserSearch(Base):
+    __tablename__ = "user_search"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    term: Mapped[str] = mapped_column(String(50))
+    create_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
+    count: Mapped[int] = mapped_column(BigInteger, default=1)
+
+
+class Devices(Base):
+    __tablename__ = "device"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    user_agent: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
+    last_active: Mapped[datetime] = mapped_column()
+
+    likes: Mapped[list["Likes"]] = relationship("Likes", back_populates="device")
+
+
+class Likes(Base):
+    __tablename__ = "likes"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    device_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("device.id"))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=func.now()
+    )
+
+    device: Mapped["Devices"] = relationship("Devices", back_populates="likes")

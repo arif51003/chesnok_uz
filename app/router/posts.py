@@ -1,14 +1,15 @@
-from fastapi import APIRouter, HTTPException, Path, Query,Response,Cookie
-from sqlalchemy import select
+from fastapi import APIRouter, HTTPException, Path, Query, Response, Cookie
+from sqlalchemy import select,or_
+from datetime import datetime, timedelta
 
 from app.database import db_dep
-from app.models import Post, Category
+from app.models import Post, Category, PostTag, Tag, UserSearch
 from app.schemas import (
     PostCreateRequest,
     PostListResponse,
     PostUpdateRequest,
     Categories,
-    CookieData
+    CookieData,
 )
 from app.utils import generate_slug
 
@@ -17,7 +18,11 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 
 @router.get("/list/", response_model=list[PostListResponse])
 async def get_posts(session: db_dep, item: Categories, is_active: bool = None):
-    stmt = select(Post).join(Category).where(Category.name == item)
+    stmt = (
+        select(Post)
+        .join(Category, Post.category_id == Category.id)
+        .where(Category.slug == item)
+    )
 
     if is_active is not None:
         stmt = stmt.where(Post.is_active == is_active)
@@ -45,6 +50,8 @@ async def post_create(session: db_dep, create_date: PostCreateRequest):
         title=create_date.title,
         body=create_date.body,
         slug=generate_slug(create_date.title),
+        category_id=create_date.category_id,
+        user_id=create_date.user_id
     )
 
     session.add(post)
@@ -62,12 +69,12 @@ async def post_update(session: db_dep, post_id: int, update_data: PostUpdateRequ
 
     if not post:
         raise HTTPException(status_code=404, detail="Not found")
-    if update_data.title:
+    if update_data.title is not None:
         post.title = update_data.title
-    if update_data.body:
+        post.slug = generate_slug(update_data.title)
+    if update_data.body is not None:
         post.body = update_data.body
-    post.slug = generate_slug(update_data.title)
-    if update_data.category_id:
+    if update_data.category_id is not None:
         post.category_id = update_data.category_id
 
     session.commit()
@@ -105,33 +112,63 @@ async def deactive(session: db_dep, post_id: int, is_active: bool = None):
 
     return post
 
+
 @router.post("/set-cookie/")
 def set_cookie(data: CookieData, response: Response):
-    response.set_cookie(
-        key=data.key,
-        value=data.value,
-        httponly=True,   
-        max_age=60 * 60 
-    )
+    response.set_cookie(key=data.key, value=data.value, httponly=True, max_age=60)
     return {"message": "Cookie saqlandi"}
 
 
 @router.get("/get-cookie/")
 def get_cookie(user_token: str | None = Cookie(default=None)):
-    """
-    Get cookie by user token
-
-    Args:
-        user_token (str | None): User token. Defaults to None.
-
-    Returns:
-        dict: Response with user token or message that cookie is not set
-    """
     if not user_token:
         return {"message": "Cookie topilmadi"}
     return {"user_token": user_token}
 
-@router.delete("/delete-cookie/")
-def delete_cookie(response: Response):
-    response.delete_cookie("user_token")
-    return {"message": "Cookie o‘chirildi"}
+
+@router.get("/trending/", response_model=list[PostListResponse])
+async def trend_post(session: db_dep):
+    stmt = (
+        select(Post)
+        .where(Post.created_at >= (datetime.now() - timedelta(days=7)))
+        .order_by(Post.likes_count.desc())
+        .limit(5)
+    )
+    res = session.execute(stmt).scalars().all()
+
+    return res
+
+
+@router.get("/search/", response_model=list[PostListResponse])
+async def search_user(session: db_dep, word: str):
+    stmt = (
+        select(Post)
+        .join(Category, Category.id == Post.category_id)
+        .join(PostTag, PostTag.post_id == Post.id)
+        .join(Tag, Tag.id == PostTag.tag_id)
+        .where (
+            or_(
+            (Post.title.like(f"%{word}%")),
+            (Tag.name.like(f"%{word}%")),
+            (Category.name.like(f"%{word}%"))
+            )))
+
+    res = session.execute(stmt)
+    post = res.scalars().all()
+
+
+    search=select(UserSearch).where(UserSearch.term==word)
+    serc=session.execute(search).scalars().first()
+    
+    if serc:
+        serc.count+=1
+    else:
+        serc=UserSearch(
+            term=word.lower()
+        )
+        session.add(serc)
+        
+    session.commit()
+    session.refresh(serc)
+    
+    return post

@@ -7,6 +7,7 @@ class PostCreateRequest(BaseModel):
     title: str | None = None
     body: str | None = None
     user_id: int | None = None
+    category_id : int | None = None
 
     model_config = {
         "json_schema_extra": {
@@ -14,7 +15,8 @@ class PostCreateRequest(BaseModel):
                 {
                     "title": "EXAMPLE",
                     "body": "Example bo'gannan kiyn bodysi nimayam bo'sin",
-                    "user": 9,
+                    "user_id": 9,
+                    "category_id":4
                 }
             ]
         }
@@ -177,15 +179,16 @@ class UserUpdateRequest(BaseModel):
 
 
 class Categories(str, Enum):
-    TECHNOLOGY = "Texnoligiya"
-    MEDICINA = "Tibbiyot"
-    EDUCATION = "Ta'lim"
-    BUISSNESS = "Biznes"
-    SINCE = "Ilm"
-    PSIXOLOGY = "Psixologiya"
-    SPORT = "Sport"
-    CULTURE = "Madaniyat"
-    IT = "IT"
+    TECHNOLOGY = "texnologiya"
+    MEDICINA = "tibbiyot"
+    EDUCATION = "talim"
+    BUISSNESS = "biznes"
+    SINCE = "ilm"
+    PSIXOLOGY = "psixologiya"
+    SPORT = "sport"
+    CULTURE = "madaniyat"
+    IT = "it"
+
 
 class CookieData(BaseModel):
     key: str
