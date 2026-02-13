@@ -35,7 +35,9 @@ class User(BaseModel):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_staff: Mapped[bool] = mapped_column(Boolean, default=False)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
-
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
+    deleted_email : Mapped[str] = mapped_column(String(100),nullable=True)
+    
     posts: Mapped[list["Post"]] = relationship(
         "Post", back_populates="user", cascade="all,delete-orphan", passive_deletes=True
     )
@@ -44,7 +46,7 @@ class User(BaseModel):
         "Comment", back_populates="user", passive_deletes=True
     )
     avatar: Mapped["Media"] = relationship("Media", foreign_keys=[avatar_id])
-
+    user_sessions : Mapped[list["UserSessionToken"]] = relationship( back_populates="user", lazy="raise_on_sql")
     def __repr__(self):
         return f"User:{self.first_name} {self.last_name}"
 
@@ -191,3 +193,13 @@ class Likes(Base):
     )
 
     device: Mapped["Devices"] = relationship("Devices", back_populates="likes")
+
+class UserSessionToken(BaseModel):
+    __tablename__="user_session_token"
+    id: Mapped[int] = mapped_column(BigInteger,primary_key=True)
+    user_id : Mapped[int] = mapped_column(BigInteger,ForeignKey("user.id",ondelete="CASCADE"))
+    token : Mapped[str] = mapped_column(String(255),unique=True)
+    created_at : Mapped[datetime] = mapped_column(DateTime(timezone=True),default=func.now())
+    expires_at : Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    
+    user: Mapped["User"] = relationship(back_populates="user_sessions")

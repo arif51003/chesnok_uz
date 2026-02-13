@@ -3,7 +3,7 @@ from sqlalchemy import select
 
 from app.database import db_dep
 from app.models import Category
-from app.schemas import CategoryCreateRequest, CategoryListResonse
+from app.schemas.category_schema import CategoryCreateRequest, CategoryListResonse
 from app.utils import generate_slug
 
 router = APIRouter(prefix="/category", tags=["Category"])

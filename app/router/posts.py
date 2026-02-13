@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from app.database import db_dep
 from app.models import Post, Category, PostTag, Tag, UserSearch
-from app.schemas import (
+from app.schemas.post_schema import (
     PostCreateRequest,
     PostListResponse,
     PostUpdateRequest,
@@ -148,9 +148,9 @@ async def search_user(session: db_dep, word: str):
         .join(Tag, Tag.id == PostTag.tag_id)
         .where (
             or_(
-            (Post.title.like(f"%{word}%")),
-            (Tag.name.like(f"%{word}%")),
-            (Category.name.like(f"%{word}%"))
+            (Post.slug.like(f"%{word}%")),
+            (Tag.slug.like(f"%{word}%")),
+            (Category.slug.like(f"%{word}%"))
             )))
 
     res = session.execute(stmt)
@@ -162,6 +162,7 @@ async def search_user(session: db_dep, word: str):
     
     if serc:
         serc.count+=1
+        serc.create_at=datetime.now()
     else:
         serc=UserSearch(
             term=word.lower()

@@ -3,29 +3,11 @@ from sqlalchemy import select
 
 from app.database import db_dep
 from app.models import User
-from app.schemas import UserCreateRequest, UserListResponse, UserUpdateRequest
+from app.schemas.user_schema import *
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("/create/", response_model=UserListResponse)
-async def user_create(session: db_dep, data: UserCreateRequest):
-    user = User(
-        email=data.email,
-        password_hash=data.password,
-        first_name=data.first_name,
-        last_name=data.last_name,
-        bio=data.bio,
-        profession_id=data.profession_id,
-        is_staff=data.is_staff,
-        is_superuser=data.is_superuser,
-    )
-
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-
-    return user
 
 
 @router.get("/list/", response_model=list[UserListResponse])
@@ -82,6 +64,8 @@ async def del_user(session: db_dep, user_id):
     if not user:
         raise HTTPException(status_code=404, detail="NOT FONUD")
 
-    session.delete(user)
-    session.refresh(user)
+    user.is_active=False
+    
     session.commit()
+    session.refresh(user)
+    

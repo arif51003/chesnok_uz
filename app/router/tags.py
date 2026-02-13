@@ -3,7 +3,7 @@ from sqlalchemy import select
 
 from app.database import db_dep
 from app.models import Tag
-from app.schemas import *
+from app.schemas.tag_schema import *
 from app.utils import generate_slug
 
 router = APIRouter(prefix="/tag", tags=["Tags"])
