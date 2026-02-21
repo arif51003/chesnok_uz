@@ -8,7 +8,7 @@ from app.router import (
     whether_router,
     auth_router
     )
-
+from app.admins.settings import admin
 
 app = FastAPI(
     title="Chesnokdek sassiq yangiliklar",
@@ -22,3 +22,5 @@ app.include_router(tag_router)
 app.include_router(user_router)
 app.include_router(search_router)
 app.include_router(whether_router)
+
+admin.mount_to(app=app)

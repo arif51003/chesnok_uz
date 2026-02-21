@@ -54,3 +54,6 @@ class UserProfileResponse(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     bio: str | None = None
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str
