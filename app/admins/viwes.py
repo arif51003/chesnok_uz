@@ -37,3 +37,74 @@ class UserAdminViwe(ModelView):
         "post_read_count"
     ]
     
+
+    
+    
+class PostAdminView(ModelView):
+    fields = [
+        "id",
+        "title",
+        "slug",
+        "body",
+        "user_id",
+        "category_id",
+        "views_count",
+        "likes_count",
+        "comments_count",
+        "mins_read",
+        "created_at",
+        "updated_at",
+    ]
+
+    exclude_fields_from_list = [
+        "body",
+    ]
+
+    exclude_fields_from_create = [
+        "id",
+        "views_count",
+        "likes_count",
+        "comments_count",
+        "created_at",
+        "updated_at",
+    ]
+
+    exclude_fields_from_edit = [
+        "id",
+        "views_count",
+        "likes_count",
+        "comments_count",
+        "created_at",
+        "updated_at",
+    ]
+
+    exclude_fields_from_detail = []
+    
+    
+class CommentAdminView(ModelView):
+    fields = [
+        "id",
+        "user_id",
+        "post_id",
+    ]
+    
+    
+class ProfessionAdminView(ModelView):
+    fields = [
+        "id",
+        "name",
+    ]
+
+    exclude_fields_from_create = ["id"]
+    exclude_fields_from_edit = ["id"]
+    
+    
+class TagAdminView(ModelView):
+    fields = [
+        "id",
+        "name",
+        "slug",
+    ]
+
+    exclude_fields_from_create = ["id"]
+    exclude_fields_from_edit = ["id"]

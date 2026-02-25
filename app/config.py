@@ -20,6 +20,12 @@ class Settings(BaseSettings):
 
     ALGORITHM: str = "HS256"
     
+    EMAIL_ADDRESS:str="ytuber1003@gmail.com"
+    SMTP_SERVER:str = "smtp.gmail.com"
+    SMTP_PORT:int=587
+    EMAIL_PASSWORD:str
+    REDIS_URL:str="redis://localhost:6379/0"
+    
     class Config:
         env_file =".env"
     

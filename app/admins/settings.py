@@ -1,9 +1,14 @@
 from starlette_admin.contrib.sqla import  Admin
 
 from app.database import engine
-from app.models import User
-from .viwes import UserAdminViwe
+from app.models import User,Post,Comment,Profession,Tag
+from .viwes import UserAdminViwe,PostAdminView,CommentAdminView,ProfessionAdminView,TagAdminView
+from app.admins.auth import JSONAuthProvider
 
-admin=Admin(engine=engine,title="Admin panel",base_url="/admin")
+admin=Admin(engine=engine,title="Admin panel",base_url="/admin",auth_provider=JSONAuthProvider(login_path="/login", logout_path="/logout"))
 
 admin.add_view(UserAdminViwe(User,icon="fa fa-user"))
+admin.add_view(PostAdminView(Post,icon="fa fa-video"))
+admin.add_view(CommentAdminView(Comment, icon="fa fa-message"))
+admin.add_view(ProfessionAdminView(Profession,icon="fa fa-spinner"))
+admin.add_view(TagAdminView(Tag,icon="fa fa-tag"))
